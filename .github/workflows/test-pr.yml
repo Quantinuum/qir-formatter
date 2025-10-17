@@ -1,0 +1,101 @@
+name: Test PR
+
+on: 
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+    github-actions-linter:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                # Checkout the merge commit to include changes from both the base and the head of the PR
+                ref: refs/pull/${{ github.event.pull_request.number }}/merge
+                sparse-checkout: |
+                    .github
+
+            - name: Fetch main branch for Super-Linter
+              run: git fetch origin main:main
+
+            - name: Lint GitHub Actions workflows
+              uses: github/super-linter/slim@v7
+              id: lint
+              env:
+                VALIDATE_GITHUB_ACTIONS: true
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                ENABLE_GITHUB_ACTIONS_STEP_SUMMARY: true
+                SAVE_SUPER_LINTER_OUTPUT: true
+                LOG_LEVEL: "ERROR"
+            - name: Read linter output
+              id: read-lint-output
+              if: failure()
+              run: |
+                LINT_FILE="super-linter-output/super-linter/super-linter-parallel-stdout-GITHUB_ACTIONS"
+                if [ -f "$LINT_FILE" ]; then
+                    # Limit output to avoid huge comments
+                    LINT_ERRORS="$(head -100 "$LINT_FILE")"
+                else
+                    LINT_ERRORS="No linter output found."
+                fi
+                cat <<EOF >> "$GITHUB_OUTPUT"
+                lint-errors<<EOL
+                $LINT_ERRORS
+                EOL
+                EOF
+
+            - name: Post a comment if there are linting errors
+              uses: marocchino/sticky-pull-request-comment@v2
+              if: failure()
+              with:
+                header: pr-github-action-lint-error
+                message: |
+                  Errors were found in your GitHub Actions workflows. Please fix them to proceed.
+
+                  Details:
+                  ```
+                  ${{ steps.read-lint-output.outputs.lint-errors }}
+                  ```
+
+            # Delete previous comments when the issues have been resolved
+            # This step doesn't run if any of the previous checks fails.
+            - name: Delete previous comments
+              uses: marocchino/sticky-pull-request-comment@v2
+              with:
+                header: pr-github-action-lint-error
+                delete: true
+
+            - name: Set up Python
+              uses: actions/setup-python@v6
+              with:
+                # Uses the latest python version allowed by the project's constraints.
+                python-version-file: pyproject.toml
+            
+            - name: Install dev dependencies
+              run: |
+                uv sync --locked --all-extras
+            
+            - name: Run ci_checks.sh script, if it's present
+              run: test ! -f src/scripts/ci_checks.sh || uv run src/scripts/ci_checks.sh
+            
+            - name: Test qir-formatter with pytest
+              run: |
+                uv run pytest
+            
+            - name: Upload pytest test results
+              uses: actions/upload-artifact@v4
+              with:
+                name: pytest-results
+                path: src/qir_formatter/htmlcov
+                
+
