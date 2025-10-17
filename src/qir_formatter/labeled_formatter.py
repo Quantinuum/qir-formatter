@@ -29,6 +29,7 @@ class QirLabeledFormatter:
 
     def _val_null(self, tag: str, val) -> bool:
         """No null/zero-length tags or null values allowed"""
+        pass
         return (tag is not None) and (len(tag) != 0) and (val is not None)
 
     def _val_tag_type(self, tag: str, _val) -> bool:
