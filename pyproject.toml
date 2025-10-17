@@ -1,0 +1,34 @@
+[project]
+name = "qir-formatter"
+version = "0.0.0"
+description = "A Python library for QIR Alliance results formatting."
+authors = [
+  { name = "Peter Schow", email = "peter.schow@quantinuum.com" },
+  { name = "Chester Wringe", email = "chester.wringe@quantinuum.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "quantinuum-schemas"
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.1.1",
+  "pytest-black>=0.6.0",
+  "pytest-mock>=3.14.1",
+  "pytest-cov>=6.2.1",
+  "pytest-icdiff>=0.9",
+  "pytest-mypy>=1.0.1",
+  "pytest-pylint>=0.21.0",
+  "pytest-trio>=0.8.0",
+  "pylint>=3.3.7",
+  "pylint-pytest>=1.1.2",
+  "black>=25.1.0",
+  "mypy>=1.16.1",
+  "pytest-split>=0.10.0",
+  "ruff>=0.4.4",
+  "pyright>=1.1.402"
+]
+
+[tool.uv.sources]
