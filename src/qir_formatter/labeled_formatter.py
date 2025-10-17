@@ -1,9 +1,17 @@
 """Convert Nexus model of v4 results to QIR standard compliant results."""
 
 from io import StringIO
-from typing import Dict
+from typing import Annotated, Dict, TypeAlias, Union
 
-from quantinuum_schemas import QsysShot, QsysShots
+from pydantic import StringConstraints
+
+QShotValType: TypeAlias = Union[int, bool, float]
+QsysShotItemValue = QShotValType | list[QShotValType]
+QsysShotItem = tuple[
+    Annotated[str, StringConstraints(max_length=256)], QsysShotItemValue
+]
+QsysShot = list[QsysShotItem]
+QsysShots = list[QsysShot]
 
 # Conversion of internal raw data type to QIR Alliance type
 QIR_TYPE_MAP = {

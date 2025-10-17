@@ -15,6 +15,7 @@ devenv.local.yaml
 .dmypy.json
 .mypy_cache
 *.egg-info
+*/*/__pycache__/
 # direnv
 .direnv
 

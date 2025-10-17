@@ -8,8 +8,9 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
+
 dependencies = [
-    "quantinuum-schemas"
+  "pydantic-settings>=2.9.1",
 ]
 
 [dependency-groups]
