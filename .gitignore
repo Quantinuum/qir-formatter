@@ -12,7 +12,9 @@ devenv.local.nix
 .devenv*
 devenv.local.nix
 devenv.local.yaml
-
+.dmypy.json
+.mypy_cache
+*.egg-info
 # direnv
 .direnv
 
