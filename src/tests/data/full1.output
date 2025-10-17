@@ -1,0 +1,17 @@
+HEADER	schema_id	labeled
+HEADER	schema_version	1.0
+START
+METADATA	entry_point
+METADATA	qir_profiles	base_profile
+METADATA	required_num_qubits	9
+METADATA	required_num_results	3
+OUTPUT	INT	3	reg1
+OUTPUT	DOUBLE	1.43	reg2
+OUTPUT	INT	1	reg:3
+END	0
+START
+OUTPUT	INT	9	reg1
+END	0
+START
+OUTPUT	INT	-2	reg1
+END	0
