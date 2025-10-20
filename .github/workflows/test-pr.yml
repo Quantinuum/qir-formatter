@@ -96,11 +96,11 @@ jobs:
                 uv sync --locked --all-extras
             
             - name: Run ci_checks.sh script, if it's present
-              run: test ! -f src/scripts/ci_checks.sh || uv run src/scripts/ci_checks.sh
+              run: test ! -f ../../src/scripts/ci_checks.sh || uv run ../../src/scripts/ci_checks.sh
             
             - name: Test qir-formatter with pytest
               run: |
-                cd src && uv run pytest /tests
+                cd ../../src && uv run pytest /tests
             
             - name: Upload pytest test results
               uses: actions/upload-artifact@v4
