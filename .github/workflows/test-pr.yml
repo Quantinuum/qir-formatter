@@ -74,7 +74,16 @@ jobs:
               with:
                 header: pr-github-action-lint-error
                 delete: true
-
+    tests:
+      runs-on: ubuntu-latest
+      steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                # Checkout the merge commit to include changes from both the base and the head of the PR
+                ref: refs/pull/${{ github.event.pull_request.number }}/merge
+                sparse-checkout: |
+                    .github
             - name: Set up Python
               uses: actions/setup-python@v6
               with:
