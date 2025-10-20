@@ -24,6 +24,7 @@ QIR_TYPE_MAP = {
     "QIRTUPLE": "TUPLE",
 }
 
+
 class QirLabeledFormatter:
     """Formatter for QIR Alliance results."""
 
