@@ -29,7 +29,7 @@ class QirLabeledFormatter:
     """Formatter for QIR Output Spec results."""
 
     def _val_null(self, tag: str, val) -> bool:
-        """No null tags or null values allowed"""
+        """No null tags or null values allowed (empty strings permitted for tags)"""
         return (tag is not None) and (val is not None)
 
     def _val_tag_type(self, tag: str, _val) -> bool:
