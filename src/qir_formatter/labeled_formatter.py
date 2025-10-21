@@ -1,4 +1,4 @@
-"""Convert Nexus model of v4 results to QIR standard compliant results."""
+"""Convert Nexus model of v4 results to QIR spec-compliant results."""
 
 from io import StringIO
 from typing import Annotated, Dict, TypeAlias, Union
@@ -13,7 +13,7 @@ QsysShotItem = tuple[
 QsysShot = list[QsysShotItem]
 QsysShots = list[QsysShot]
 
-# Conversion of internal raw data type to QIR Alliance type
+# Conversion of internal raw data type to QIR type
 QIR_TYPE_MAP = {
     "INT": "INT",
     "UINT": "INT",
@@ -26,7 +26,7 @@ QIR_TYPE_MAP = {
 
 
 class QirLabeledFormatter:
-    """Formatter for QIR Alliance results."""
+    """Formatter for QIR Output Spec results."""
 
     def _val_null(self, tag: str, val) -> bool:
         """No null tags or null values allowed"""
@@ -116,7 +116,7 @@ class QirLabeledFormatter:
     ) -> str:
         """
         Given a list of results associated with an `n_qubits` job, return
-        the results in QIR Alliance "Labeled" format.
+        the results in QIR "Labeled" Output Schema format.
         """
         if len(results) == 0:
             return ""
