@@ -47,7 +47,7 @@ def test_undefined_type() -> None:
 
 
 malformed_testdata = [
-    ("INT", "", 0),
+    ("INT", 0, 0),
     ("INT", "syndrome0", None),
     ("BOOL", 5.4321, None),
     ("FLOAT", None, 99),
