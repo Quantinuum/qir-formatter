@@ -208,3 +208,18 @@ def test_malformed_raw_result_list() -> None:
     qir_output = QirLabeledFormatter().qir_labeled_output(results, attributes)
     with open("src/tests/data/malformed1.output", encoding="utf-8") as f:
         assert f.read() == qir_output
+
+
+def test_empty_tag_submission() -> None:
+    """Test empty tag submission produces output."""
+    results: QsysShots = [
+        [
+            ("USER:QIRARRAY:", 2),
+            ("USER:QIRTUPLE:", 2),
+        ]
+    ]
+    attributes: Dict[str, str | None] = {}
+    qir_output = QirLabeledFormatter().qir_labeled_output(results, attributes)
+    # assert that the output still shows with ARRAY and TUPLE types
+    assert "OUTPUT\tARRAY\t2\t\n" in qir_output
+    assert "OUTPUT\tTUPLE\t2\t\n" in qir_output

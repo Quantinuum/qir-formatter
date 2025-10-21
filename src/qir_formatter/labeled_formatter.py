@@ -29,8 +29,8 @@ class QirLabeledFormatter:
     """Formatter for QIR Alliance results."""
 
     def _val_null(self, tag: str, val) -> bool:
-        """No null/zero-length tags or null values allowed"""
-        return (tag is not None) and (len(tag) != 0) and (val is not None)
+        """No null tags or null values allowed"""
+        return (tag is not None) and (val is not None)
 
     def _val_tag_type(self, tag: str, _val) -> bool:
         """Tag must be a string"""
