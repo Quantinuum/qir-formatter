@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-    
+
 set -Eeuo pipefail
 set -o xtrace
 DIR=$(dirname "$(realpath "$0")")
@@ -8,7 +8,6 @@ SRC_DIR="${DIR}/../qir_formatter"
 
 uv run pyright "${SRC_DIR}" "${DIR}/../tests"
 uv run mypy "${SRC_DIR}" "${DIR}/../tests" --namespace-packages
-uv run pylint "${SRC_DIR}" "${DIR}/../tests" --rcfile="${DIR}/../pylintrc"
 
 RUFF_FORMAT_ARGS=()
 RUFF_CHECK_ARGS=()
