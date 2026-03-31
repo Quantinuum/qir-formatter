@@ -103,7 +103,7 @@ jobs:
             
             - name: Install dev dependencies
               run: |
-                uv sync --locked --all-extras
+                uv sync --locked --all-groups
             
             - name: Run ci_checks.sh script, if it's present
               run: test ! -f src/scripts/ci_checks.sh || uv run src/scripts/ci_checks.sh
@@ -118,4 +118,3 @@ jobs:
                 name: pytest-results
                 path: src/qir_formatter/htmlcov
                 
-
