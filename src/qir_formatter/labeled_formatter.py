@@ -99,10 +99,22 @@ class QirLabeledFormatter:
     def format_value(self, type_str: str, val):
         """Format the value if required"""
         if type_str == "RESULT_ARRAY":
-            try:
-                return "".join("1" if item else "0" for item in val)
-            except TypeError:
+            if not isinstance(val, list | tuple):
                 return None
+
+            formatted_bits: list[str] = []
+            for item in val:
+                if isinstance(item, bool):
+                    formatted_bits.append("1" if item else "0")
+                    continue
+
+                if isinstance(item, int) and item in (0, 1):
+                    formatted_bits.append(str(item))
+                    continue
+
+                return None
+
+            return "".join(formatted_bits)
 
         if type_str != "BOOL":
             return val
