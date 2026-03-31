@@ -237,12 +237,9 @@ def test_empty_tag_submission() -> None:
     [
         [],
         [False, True, False],
-        (1, 0, 1),
     ],
 )
-def test_result_array_formatting(
-    value: list[int | bool] | tuple[int | bool, ...],
-) -> None:
+def test_result_array_formatting(value: list[int | bool]) -> None:
     """Result arrays are emitted as a single binary string record."""
     qo = StringIO()
     QirLabeledFormatter().emit(qo, "RESULT_ARRAY", "results", value)
@@ -250,7 +247,7 @@ def test_result_array_formatting(
     assert qo.getvalue() == f"OUTPUT\tRESULT_ARRAY\t{expected}\tresults\n"
 
 
-@pytest.mark.parametrize("value", [None, 1, "010", [2], ["x"]])
+@pytest.mark.parametrize("value", [None, 1, "010", [2], ["x"], (1, 0, 1)])
 def test_malformed_result_array_is_ignored(
     value: object, caplog: pytest.LogCaptureFixture
 ) -> None:

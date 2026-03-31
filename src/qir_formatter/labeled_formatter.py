@@ -99,7 +99,7 @@ class QirLabeledFormatter:
     def format_value(self, type_str: str, val):
         """Format the value if required"""
         if type_str == "RESULT_ARRAY":
-            if not isinstance(val, (list, tuple)):
+            if not isinstance(val, list):
                 return None
 
             formatted_bits: list[str] = []
