@@ -20,6 +20,7 @@ QIR_TYPE_MAP = {
     "BOOL": "BOOL",
     "FLOAT": "DOUBLE",
     "RESULT": "RESULT",
+    "RESULT_ARRAY": "RESULT_ARRAY",
     "QIRARRAY": "ARRAY",
     "QIRTUPLE": "TUPLE",
 }
@@ -52,7 +53,7 @@ class QirLabeledFormatter:
     def results_header(self, qo: StringIO):
         """Emit results header."""
         qo.write("HEADER\tschema_id\tlabeled\n")
-        qo.write("HEADER\tschema_version\t1.0\n")
+        qo.write("HEADER\tschema_version\t2.1\n")
 
     def first_shot_header(self, qo: StringIO, attributes: Dict[str, str | None]):
         """Emit opening shot boundary header."""
@@ -83,6 +84,9 @@ class QirLabeledFormatter:
 
     def format_value(self, type_str: str, val):
         """Format the value if required"""
+        if type_str == "RESULT_ARRAY":
+            return "".join("1" if item else "0" for item in val)
+
         if type_str != "BOOL":
             return val
 

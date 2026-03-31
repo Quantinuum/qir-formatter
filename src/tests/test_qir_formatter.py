@@ -14,6 +14,7 @@ formatting_test_data = [
     ("FLOAT", "f0", 3.1415926, "OUTPUT\tDOUBLE\t3.1415926\tf0\n"),
     ("BOOL", "b0", 0, "OUTPUT\tBOOL\tfalse\tb0\n"),
     ("RESULT", "r0", 0, "OUTPUT\tRESULT\t0\tr0\n"),
+    ("RESULT_ARRAY", "ra0", [1, 0, 1], "OUTPUT\tRESULT_ARRAY\t101\tra0\n"),
     ("QIRARRAY", "a0", 4, "OUTPUT\tARRAY\t4\ta0\n"),
     ("QIRTUPLE", "t0", 13, "OUTPUT\tTUPLE\t13\tt0\n"),
 ]
@@ -85,6 +86,7 @@ def test_result_list() -> None:
             ("USER:INT:large", pow(2, 63) - 1),
             ("USER:INT:neg", -pow(2, 63)),
         ],
+        [("USER:RESULT_ARRAY:results", [1, 0, 1, 1])],
         [
             ("USER:QIRARRAY:0_a", 2),
             ("USER:QIRTUPLE:1_a0t", 2),
@@ -223,3 +225,18 @@ def test_empty_tag_submission() -> None:
     # assert that the output still shows with ARRAY and TUPLE types
     assert "OUTPUT\tARRAY\t2\t\n" in qir_output
     assert "OUTPUT\tTUPLE\t2\t\n" in qir_output
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        [],
+        [False, True, False],
+    ],
+)
+def test_result_array_formatting(value: list[int | bool]) -> None:
+    """Result arrays are emitted as a single binary string record."""
+    qo = StringIO()
+    QirLabeledFormatter().emit(qo, "RESULT_ARRAY", "results", value)
+    expected = "".join("1" if item else "0" for item in value)
+    assert qo.getvalue() == f"OUTPUT\tRESULT_ARRAY\t{expected}\tresults\n"
