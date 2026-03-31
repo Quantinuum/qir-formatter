@@ -248,8 +248,12 @@ def test_result_array_formatting(value: list[int | bool]) -> None:
 
 
 @pytest.mark.parametrize("value", [None, 1])
-def test_malformed_result_array_is_ignored(value: object) -> None:
+def test_malformed_result_array_is_ignored(
+    value: object, caplog: pytest.LogCaptureFixture
+) -> None:
     """Malformed result arrays should not raise and should be ignored."""
     qo = StringIO()
-    QirLabeledFormatter().emit(qo, "RESULT_ARRAY", "results", value)
+    with caplog.at_level("WARNING"):
+        QirLabeledFormatter().emit(qo, "RESULT_ARRAY", "results", value)
     assert qo.getvalue() == ""
+    assert "Skipping malformed QIR output value" in caplog.text

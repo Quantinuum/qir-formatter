@@ -1,9 +1,12 @@
 """Convert Nexus model of v4 results to QIR spec-compliant results."""
 
+import logging
 from io import StringIO
 from typing import Annotated, Dict, TypeAlias, Union
 
 from pydantic import StringConstraints
+
+logger = logging.getLogger(__name__)
 
 QShotValType: TypeAlias = Union[int, bool, float]
 QsysShotItemValue = QShotValType | list[QShotValType]
@@ -79,6 +82,15 @@ class QirLabeledFormatter:
         if qir_type is not None:
             value = self.format_value(qir_type, val)
             if value is None:
+                logger.warning(
+                    "Skipping malformed QIR output value",
+                    extra={
+                        "raw_type": ftype,
+                        "qir_type": qir_type,
+                        "tag": tag,
+                        "value_type": type(val).__name__,
+                    },
+                )
                 return
             validated = self.validate_tag_and_value(tag, val)
             if validated:
