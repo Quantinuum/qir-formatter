@@ -78,6 +78,8 @@ class QirLabeledFormatter:
         qir_type = QIR_TYPE_MAP.get(ftype)
         if qir_type is not None:
             value = self.format_value(qir_type, val)
+            if value is None:
+                return
             validated = self.validate_tag_and_value(tag, val)
             if validated:
                 qo.write(f"OUTPUT\t{qir_type}\t{value}\t{tag}\n")
@@ -85,7 +87,10 @@ class QirLabeledFormatter:
     def format_value(self, type_str: str, val):
         """Format the value if required"""
         if type_str == "RESULT_ARRAY":
-            return "".join("1" if item else "0" for item in val)
+            try:
+                return "".join("1" if item else "0" for item in val)
+            except TypeError:
+                return None
 
         if type_str != "BOOL":
             return val

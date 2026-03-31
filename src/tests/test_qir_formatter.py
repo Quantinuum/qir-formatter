@@ -21,7 +21,12 @@ formatting_test_data = [
 
 
 @pytest.mark.parametrize("ftype,tag,value,expected", formatting_test_data)
-def test_formatting(ftype: str, tag: str, value: int, expected: str) -> None:
+def test_formatting(
+    ftype: str,
+    tag: str,
+    value: int | float | list[int | bool],
+    expected: str,
+) -> None:
     """Test raw data types that are rendered to QIR output."""
     qo = StringIO()
     QirLabeledFormatter().emit(qo, ftype, tag, value)
@@ -73,7 +78,7 @@ def test_malformed(
 def test_result_list() -> None:
     """Test complete formatting of a valid list of raw results."""
 
-    # 4 shots of a variety of results
+    # 5 shots of a variety of results
     results: QsysShots = [
         [("USER:INT:i1", 42), ("USER:BOOL:b1", 1)],
         [
@@ -240,3 +245,11 @@ def test_result_array_formatting(value: list[int | bool]) -> None:
     QirLabeledFormatter().emit(qo, "RESULT_ARRAY", "results", value)
     expected = "".join("1" if item else "0" for item in value)
     assert qo.getvalue() == f"OUTPUT\tRESULT_ARRAY\t{expected}\tresults\n"
+
+
+@pytest.mark.parametrize("value", [None, 1])
+def test_malformed_result_array_is_ignored(value: object) -> None:
+    """Malformed result arrays should not raise and should be ignored."""
+    qo = StringIO()
+    QirLabeledFormatter().emit(qo, "RESULT_ARRAY", "results", value)
+    assert qo.getvalue() == ""
