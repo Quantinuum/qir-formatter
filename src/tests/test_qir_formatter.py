@@ -240,7 +240,9 @@ def test_empty_tag_submission() -> None:
         (1, 0, 1),
     ],
 )
-def test_result_array_formatting(value: list[int | bool] | tuple[int | bool, ...]) -> None:
+def test_result_array_formatting(
+    value: list[int | bool] | tuple[int | bool, ...],
+) -> None:
     """Result arrays are emitted as a single binary string record."""
     qo = StringIO()
     QirLabeledFormatter().emit(qo, "RESULT_ARRAY", "results", value)
