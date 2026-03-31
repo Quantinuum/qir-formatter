@@ -13,8 +13,13 @@ dependencies = ["pydantic>=2"]
 
 [dependency-groups]
 dev = [{ include-group = "lint" }, { include-group = "test" }]
-lint = ["ruff>=0.14", "ty>=0.0.1a16"]
-test = ["pytest>=8.2"]
+lint = [
+    "ruff>=0.15.8",
+    "ty>=0.0.26",
+]
+test = [
+    "pytest>=9.0.2",
+]
 
 [tool.ruff]
 target-version = "py310"
