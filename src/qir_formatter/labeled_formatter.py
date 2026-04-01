@@ -116,11 +116,11 @@ class QirLabeledFormatter:
 
             return "".join(formatted_bits)
 
-        if type_str != "BOOL":
-            return val
+        if type_str == "BOOL":
+            # For BOOLs, the L4 API will always return 0 or 1
+            return "true" if val else "false"
 
-        # For BOOLs, the L4 API will always return 0 or 1
-        return "true" if val else "false"
+        return val
 
     def write_shot(self, qo: StringIO, shot: QsysShot):
         """Format the user defined output from shots"""
