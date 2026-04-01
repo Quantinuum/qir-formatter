@@ -1,6 +1,6 @@
 name: Test PR
 
-on: 
+on:
   pull_request:
     types:
       - opened
@@ -95,27 +95,25 @@ jobs:
               uses: astral-sh/setup-uv@v7
               with:
               # Install a specific version of uv.
-                version: '0.7.6'
+                version: '0.11.2'
                 enable-cache: true
                 cache-dependency-glob: |
                   **/uv.lock
                   **/pyproject.toml
-            
+
             - name: Install dev dependencies
               run: |
-                uv sync --locked --all-extras
-            
+                uv sync --locked --all-groups
+
             - name: Run ci_checks.sh script, if it's present
               run: test ! -f src/scripts/ci_checks.sh || uv run src/scripts/ci_checks.sh
-            
+
             - name: Test qir-formatter with pytest
               run: |
                 uv run pytest src/tests
-            
+
             - name: Upload pytest test results
               uses: actions/upload-artifact@v4
               with:
                 name: pytest-results
                 path: src/qir_formatter/htmlcov
-                
-
