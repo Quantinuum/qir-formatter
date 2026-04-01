@@ -6,7 +6,15 @@ QIR Formatter is a Python library for formatting results from the
 ## Development
 
 ```sh
-uv sync
+uv sync --all-groups
+```
+
+## Linting
+
+```sh
+uv run ruff format --check src
+uv run ruff check src
+uv run ty check src
 ```
 
 ## Testing
