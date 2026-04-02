@@ -1,9 +1,12 @@
 """Convert Nexus model of v4 results to QIR spec-compliant results."""
 
+import logging
 from io import StringIO
 from typing import Annotated, Dict, TypeAlias, Union
 
 from pydantic import StringConstraints
+
+logger = logging.getLogger(__name__)
 
 QShotValType: TypeAlias = Union[int, bool, float]
 QsysShotItemValue = QShotValType | list[QShotValType]
@@ -20,6 +23,7 @@ QIR_TYPE_MAP = {
     "BOOL": "BOOL",
     "FLOAT": "DOUBLE",
     "RESULT": "RESULT",
+    "RESULT_ARRAY": "RESULT_ARRAY",
     "QIRARRAY": "ARRAY",
     "QIRTUPLE": "TUPLE",
 }
@@ -52,7 +56,7 @@ class QirLabeledFormatter:
     def results_header(self, qo: StringIO):
         """Emit results header."""
         qo.write("HEADER\tschema_id\tlabeled\n")
-        qo.write("HEADER\tschema_version\t1.0\n")
+        qo.write("HEADER\tschema_version\t2.1\n")
 
     def first_shot_header(self, qo: StringIO, attributes: Dict[str, str | None]):
         """Emit opening shot boundary header."""
@@ -77,17 +81,46 @@ class QirLabeledFormatter:
         qir_type = QIR_TYPE_MAP.get(ftype)
         if qir_type is not None:
             value = self.format_value(qir_type, val)
+            if value is None:
+                logger.warning(
+                    "Skipping malformed QIR output value",
+                    extra={
+                        "raw_type": ftype,
+                        "qir_type": qir_type,
+                        "tag": tag,
+                        "value_type": type(val).__name__,
+                    },
+                )
+                return
             validated = self.validate_tag_and_value(tag, val)
             if validated:
                 qo.write(f"OUTPUT\t{qir_type}\t{value}\t{tag}\n")
 
     def format_value(self, type_str: str, val):
         """Format the value if required"""
-        if type_str != "BOOL":
-            return val
+        if type_str == "RESULT_ARRAY":
+            if not isinstance(val, list):
+                return None
 
-        # For BOOLs, the L4 API will always return 0 or 1
-        return "true" if val else "false"
+            formatted_bits: list[str] = []
+            for item in val:
+                if isinstance(item, bool):
+                    formatted_bits.append("1" if item else "0")
+                    continue
+
+                if isinstance(item, int) and item in (0, 1):
+                    formatted_bits.append(str(item))
+                    continue
+
+                return None
+
+            return "".join(formatted_bits)
+
+        if type_str == "BOOL":
+            # For BOOLs, the L4 API will always return 0 or 1
+            return "true" if val else "false"
+
+        return val
 
     def write_shot(self, qo: StringIO, shot: QsysShot):
         """Format the user defined output from shots"""
