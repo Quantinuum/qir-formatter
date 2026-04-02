@@ -9,6 +9,7 @@ REQUIREMENTS_FILE=$(mktemp "${ARTIFACT_DIR}/pip-audit-requirements.XXXXXX.txt")
 trap 'rm -rf "${ARTIFACT_DIR}"' EXIT
 
 uv export \
+    --project "${ROOT_DIR}" \
     --frozen \
     --all-groups \
     --output-file "${REQUIREMENTS_FILE}" \
@@ -31,4 +32,4 @@ if [[ -n "${PIP_AUDIT_IGNORE_VULNS:-}" ]]; then
     done
 fi
 
-uv run pip-audit "${audit_args[@]}"
+uv --project "${ROOT_DIR}" run pip-audit "${audit_args[@]}"
