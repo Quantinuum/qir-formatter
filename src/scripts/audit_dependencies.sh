@@ -5,7 +5,7 @@ set -Eeuo pipefail
 ROOT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 ARTIFACT_DIR=$(mktemp -d "${TMPDIR:-/tmp}/qir-formatter-audit.XXXXXX")
 
-REQUIREMENTS_FILE=$(mktemp "${ARTIFACT_DIR}/pip-audit-requirements.XXXXXX.txt")
+REQUIREMENTS_FILE="${ARTIFACT_DIR}/pip-audit-requirements.txt"
 trap 'rm -rf "${ARTIFACT_DIR}"' EXIT
 
 uv export \
