@@ -12,6 +12,9 @@ requires-python = ">=3.10"
 dependencies = ["pydantic>=2"]
 
 [dependency-groups]
+audit = [
+    "pip-audit>=2.10.0",
+]
 dev = [{ include-group = "lint" }, { include-group = "test" }]
 lint = [
     "ruff>=0.15.8",

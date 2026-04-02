@@ -108,6 +108,10 @@ jobs:
             - name: Run ci_checks.sh script, if it's present
               run: test ! -f src/scripts/ci_checks.sh || uv run src/scripts/ci_checks.sh
 
+            - name: Audit dependencies
+              run: |
+                uv run src/scripts/audit_dependencies.sh
+
             - name: Test qir-formatter with pytest
               run: |
                 uv run pytest src/tests
