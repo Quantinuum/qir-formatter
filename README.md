@@ -17,6 +17,15 @@ uv run ruff check src
 uv run ty check src
 ```
 
+## Dependency Audit
+
+```sh
+uv run src/scripts/audit_dependencies.sh
+```
+
+The audit exports the pinned dependencies from `uv.lock` and scans them with
+`pip-audit`.
+
 ## Testing
 
 ```sh
