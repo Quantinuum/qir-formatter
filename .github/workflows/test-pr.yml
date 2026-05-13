@@ -45,7 +45,7 @@ jobs:
 
             - name: Audit dependencies
               run: |
-                uv run src/scripts/audit_dependencies.sh
+                uv audit --locked --preview-features audit
 
             - name: Install dev dependencies
               run: |

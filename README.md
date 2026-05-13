@@ -79,6 +79,11 @@ uv sync --all-groups
 Optional local environment files such as `devenv.*` and `.envrc` are kept for
 maintainer convenience, but they are not required to build or test the project.
 
+Pull requests should keep changes focused, include tests when behavior changes,
+and use the conventional-commit title format already enforced by the repo, for
+example `fix: handle malformed result arrays` or `docs: expand README usage
+example`.
+
 ### Linting
 
 ```sh
@@ -96,13 +101,25 @@ uv run pytest
 ### Dependency Audit
 
 ```sh
-uv run src/scripts/audit_dependencies.sh
+uv audit --locked --preview-features audit
 ```
 
-The audit uses `uv audit --locked` to scan pinned dependencies directly from
-`uv.lock`. The repo also configures `uv` with a 7-day dependency cooldown so
-routine resolution avoids newly uploaded packages while the ecosystem has time
-to surface supply-chain issues.
+This scans pinned dependencies directly from `uv.lock`. The repo also
+configures `uv` with a 7-day dependency cooldown so routine resolution avoids
+newly uploaded packages while the ecosystem has time to surface supply-chain
+issues.
+
+### Git Hooks
+
+The repo includes a `prek` configuration in `.pre-commit-config.yaml`.
+
+```sh
+uvx prek install
+uvx prek run --all-files
+```
+
+This runs `ruff` formatting and lint fixes, a `ty` type-check pass, and a small
+set of builtin file hygiene checks before commit.
 
 ## Support
 

@@ -6,7 +6,7 @@ on:
 env:
   UV_VERSION: "0.6.6"
   PYTHON_VERSION: "3.10"
-  
+
 jobs:
   build-and-publish:
     name: Build and publish
@@ -23,7 +23,7 @@ jobs:
         enable-cache: true
         python-version: ${{ env.PYTHON_VERSION }}
         cache-dependency-glob: uv.lock
-    
+
     - name: Build
       run: uv build
 
