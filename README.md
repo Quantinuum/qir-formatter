@@ -1,7 +1,7 @@
 # QIR Formatter
 
 `qir-formatter` is a Python library for rendering execution results into the
-[QIR labeled output schema](https://github.com/qir-alliance/qir-spec/blob/a67da3a3bd902ba7cd94a98722ca5f8c89f5a81a/specification/under_development/output_schemas/Labeled.md).
+[QIR labeled output schema](https://github.com/qir-alliance/qir-spec/blob/a177eee5885d99e965f5cb919c8d70b0ab7a6a15/specification/output_schemas/Labeled.md).
 It accepts shot-oriented result data in the internal `USER:<TYPE>:<TAG>` form
 and emits the text format expected by tools that consume labeled QIR output.
 
@@ -99,8 +99,10 @@ uv run pytest
 uv run src/scripts/audit_dependencies.sh
 ```
 
-The audit exports pinned dependencies from `uv.lock` and scans them with
-`pip-audit`.
+The audit uses `uv audit --locked` to scan pinned dependencies directly from
+`uv.lock`. The repo also configures `uv` with a 7-day dependency cooldown so
+routine resolution avoids newly uploaded packages while the ecosystem has time
+to surface supply-chain issues.
 
 ## Support
 

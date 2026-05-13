@@ -28,6 +28,9 @@ To run the dependency audit locally:
 uv run src/scripts/audit_dependencies.sh
 ```
 
+This runs `uv audit --locked` against the pinned lockfile rather than auditing
+an already-installed environment.
+
 ## Pull Requests
 
 Keep changes focused and include tests when behavior changes.
