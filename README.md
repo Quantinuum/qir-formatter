@@ -1,7 +1,7 @@
 # QIR Formatter
 
 `qir-formatter` is a Python library for rendering execution results into the
-[QIR labeled output schema](https://github.com/qir-alliance/qir-spec/blob/a177eee5885d99e965f5cb919c8d70b0ab7a6a15/specification/output_schemas/Labeled.md).
+[QIR labeled output schema](https://github.com/qir-alliance/qir-spec/blob/2.1/specification/output_schemas/Labeled.md).
 It accepts shot-oriented result data in the internal `USER:<TYPE>:<TAG>` form
 and emits the text format expected by tools that consume labeled QIR output.
 

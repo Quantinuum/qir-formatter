@@ -9,6 +9,7 @@ repos:
   - repo: builtin
     hooks:
       - id: trailing-whitespace
+        exclude: ^src/tests/data/.*\.output$
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-toml
