@@ -594,7 +594,7 @@ wheels = [
 [[package]]
 name = "qir-formatter"
 version = "0.2.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "pydantic" },
 ]
