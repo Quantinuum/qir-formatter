@@ -18,7 +18,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
             - name: Checkout code
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
               with:
                 # Checkout the merge commit to include changes from both the base and the head of the PR
                 ref: refs/pull/${{ github.event.pull_request.number }}/merge
@@ -34,7 +34,7 @@ jobs:
                 python-version-file: pyproject.toml
 
             - name: Install uv
-              uses: astral-sh/setup-uv@v7
+              uses: astral-sh/setup-uv@v8.1.0
               with:
               # Install a specific version of uv.
                 version: '0.11.2'
@@ -59,7 +59,7 @@ jobs:
                 uv run pytest src/tests
 
             - name: Upload pytest test results
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                 name: pytest-results
                 path: src/qir_formatter/htmlcov
