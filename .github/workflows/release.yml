@@ -4,28 +4,26 @@ on:
   release:
     types: [created]
 env:
-  UV_VERSION: "0.6.6"
   PYTHON_VERSION: "3.10"
-  
+
 jobs:
   build-and-publish:
     name: Build and publish
     runs-on: ubuntu-24.04
     steps:
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: '0'
     - name: Set up uv & venv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v8.1.0
       with:
-        version: ${{ env.UV_VERSION }}
         enable-cache: true
         python-version: ${{ env.PYTHON_VERSION }}
         cache-dependency-glob: uv.lock
-    
+
     - name: Build
       run: uv build
 
     - name: Publish to PyPI
-      run: uv  publish --token ${{ secrets.PYPI_TOKEN}}
+      run: uv publish --token ${{ secrets.PYPI_TOKEN }}

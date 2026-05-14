@@ -1,3 +1,4 @@
+.DS_Store
 **/.vscode/**
 .venv
 .env
@@ -5,9 +6,7 @@
 uv_secrets.txt
 .devenv*
 devenv.local.nix
-.pre-commit-config.yaml
 .direnv/
-.pre-commit-config.yaml
 # Devenv
 .devenv*
 devenv.local.nix
@@ -18,6 +17,3 @@ devenv.local.yaml
 */*/__pycache__/
 # direnv
 .direnv
-
-# pre-commit
-.pre-commit-config.yaml

@@ -1,15 +1,90 @@
 # QIR Formatter
 
-QIR Formatter is a Python library for formatting results from the
-[QIR Labeled Output Schema](https://github.com/qir-alliance/qir-spec/blob/a67da3a3bd902ba7cd94a98722ca5f8c89f5a81a/specification/under_development/output_schemas/Labeled.md).
+`qir-formatter` is a Python library for rendering execution results into the
+[QIR labeled output schema](https://github.com/qir-alliance/qir-spec/blob/2.1/specification/output_schemas/Labeled.md).
+It accepts shot-oriented result data in the internal `USER:<TYPE>:<TAG>` form
+and emits the text format expected by tools that consume labeled QIR output.
+
+## Installation
+
+```sh
+pip install qir-formatter
+```
+
+## Usage
+
+The formatter operates on a list of shots, where each shot is a list of
+`(name, value)` tuples. User-facing values should use the
+`USER:<TYPE>:<TAG>` naming convention.
+
+```python
+from qir_formatter import QirLabeledFormatter, QsysShots
+
+results: QsysShots = [
+    [
+        ("USER:INT:shots", 42),
+        ("USER:BOOL:accepted", 1),
+        ("USER:RESULT_ARRAY:bits", [1, 0, 1]),
+    ]
+]
+
+attributes = {
+    "qir_profiles": "base_profile",
+    "required_num_qubits": "3",
+    "required_num_results": "3",
+}
+
+output = QirLabeledFormatter().qir_labeled_output(results, attributes)
+print(output)
+```
+
+This produces:
+
+```text
+HEADER	schema_id	labeled
+HEADER	schema_version	2.1
+START
+METADATA	entry_point
+METADATA	qir_profiles	base_profile
+METADATA	required_num_qubits	3
+METADATA	required_num_results	3
+OUTPUT	INT	42	shots
+OUTPUT	BOOL	true	accepted
+OUTPUT	RESULT_ARRAY	101	bits
+END	0
+```
+
+Only `USER` records are emitted. Known raw types currently map to the labeled
+QIR schema as follows:
+
+- `INT` and `UINT` become `INT`
+- `FLOAT` becomes `DOUBLE`
+- `BOOL` becomes `BOOL`
+- `RESULT` becomes `RESULT`
+- `RESULT_ARRAY` becomes `RESULT_ARRAY`
+- `QIRARRAY` becomes `ARRAY`
+- `QIRTUPLE` becomes `TUPLE`
+
+Malformed values are skipped rather than raising, which makes the formatter
+safe to use on partially clean result streams.
 
 ## Development
+
+The primary contributor workflow uses `uv`.
 
 ```sh
 uv sync --all-groups
 ```
 
-## Linting
+Optional local environment files such as `devenv.*` and `.envrc` are kept for
+maintainer convenience, but they are not required to build or test the project.
+
+Pull requests should keep changes focused, include tests when behavior changes,
+and use the conventional-commit title format already enforced by the repo, for
+example `fix: handle malformed result arrays` or `docs: expand README usage
+example`.
+
+### Linting
 
 ```sh
 uv run ruff format --check src
@@ -17,17 +92,37 @@ uv run ruff check src
 uv run ty check src
 ```
 
-## Dependency Audit
-
-```sh
-uv run src/scripts/audit_dependencies.sh
-```
-
-The audit exports the pinned dependencies from `uv.lock` and scans them with
-`pip-audit`.
-
-## Testing
+### Testing
 
 ```sh
 uv run pytest
 ```
+
+### Dependency Audit
+
+```sh
+uv audit --locked --preview-features audit
+```
+
+This scans pinned dependencies directly from `uv.lock`. The repo also
+configures `uv` with a 7-day dependency cooldown so routine resolution avoids
+newly uploaded packages while the ecosystem has time to surface supply-chain
+issues.
+
+### Git Hooks
+
+The repo includes a `prek` configuration in `.pre-commit-config.yaml`.
+
+```sh
+uvx prek install
+uvx prek run --all-files
+```
+
+This runs `ruff` formatting and lint fixes, a `ty` type-check pass, and a small
+set of builtin file hygiene checks before commit.
+
+## Support
+
+For bug reports, feature requests, or questions about the public package, open
+an issue in the
+[GitHub repository](https://github.com/Quantinuum/qir-formatter/issues).

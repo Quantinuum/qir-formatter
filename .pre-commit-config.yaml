@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.12
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: builtin
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^src/tests/data/.*\.output$
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: ty
+        name: ty
+        entry: uv run ty check src
+        language: system
+        pass_filenames: false

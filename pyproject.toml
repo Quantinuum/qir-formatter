@@ -5,23 +5,46 @@ description = "A Python library for QIR Alliance results formatting."
 authors = [
   { name = "Peter Schow", email = "peter.schow@quantinuum.com" },
   { name = "Chester Wringe", email = "chester.wringe@quantinuum.com" },
+  { name = "Kartik Singhal", email = "kartik.singhal@quantinuum.com" },
+]
+maintainers = [
+  { name = "Chester Wringe" },
+  { name = "Kartik Singhal" },
 ]
 readme = "README.md"
 requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+keywords = ["qir", "quantum", "formatter", "results"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
 
 dependencies = ["pydantic>=2"]
 
+[project.urls]
+Homepage = "https://github.com/Quantinuum/qir-formatter"
+Repository = "https://github.com/Quantinuum/qir-formatter"
+Issues = "https://github.com/Quantinuum/qir-formatter/issues"
+
 [dependency-groups]
-audit = [
-    "pip-audit>=2.10.0",
-]
 dev = [{ include-group = "lint" }, { include-group = "test" }]
 lint = [
     "ruff>=0.15.8",
     "ty>=0.0.26",
 ]
 test = [
-    "pytest>=9.0.2",
+    "pytest>=9.0.3",
 ]
 
 [tool.ruff]
@@ -33,4 +56,11 @@ error-on-warning = true
 [tool.ty.environment]
 python-version = "3.10"
 
+[tool.uv]
+exclude-newer = "7 days"
+
 [tool.uv.sources]
+
+[build-system]
+requires = ["uv_build>=0.11.10,<0.12.0"]
+build-backend = "uv_build"
