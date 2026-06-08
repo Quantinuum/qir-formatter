@@ -11,8 +11,6 @@ from qir_formatter.labeled_formatter import (
 
 from ._core import QirLabeledFormatter as RustQirLabeledFormatter
 
-x = RustQirLabeledFormatter().test()
-
 __all__ = [
     "QirLabeledFormatter",
     "QShotValType",

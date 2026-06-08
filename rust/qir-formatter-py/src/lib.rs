@@ -8,7 +8,7 @@ use pyo3_stub_gen::{
 
 #[gen_stub_pyclass]
 #[pyclass(name = "QirLabeledFormatter")]
-pub struct QirLabeledFormatter {}
+pub struct QirLabeledFormatter(qir_formatter::QirLabeledFormatter);
 
 #[gen_stub_pymethods]
 #[pymethods]
