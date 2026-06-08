@@ -38,7 +38,11 @@ Repository = "https://github.com/Quantinuum/qir-formatter"
 Issues = "https://github.com/Quantinuum/qir-formatter/issues"
 
 [dependency-groups]
-dev = [{ include-group = "lint" }, { include-group = "test" }]
+dev = [
+    { include-group = "lint" },
+    { include-group = "test" },
+    "maturin>=1.13.3",
+]
 lint = [
     "ruff>=0.15.8",
     "ty>=0.0.26",
@@ -62,5 +66,11 @@ exclude-newer = "7 days"
 [tool.uv.sources]
 
 [build-system]
-requires = ["uv_build>=0.11.10,<0.12.0"]
-build-backend = "uv_build"
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+manifest-path = "rust/qir-formatter-py/Cargo.toml"
+python-source = "src"
+module-name = "qir_formatter._core"
+features = ["pyo3/extension-module"]

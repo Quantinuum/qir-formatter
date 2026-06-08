@@ -1,0 +1,14 @@
+[package]
+name = "qir-formatter-py"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+name = "_core"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+qir-formatter = { path = "../qir-formatter"}
+pyo3 = "0.28.3"
+pyo3-stub-gen = "0.22.3"
