@@ -5,8 +5,7 @@ from io import StringIO
 from typing import Dict, Optional, Union
 
 import pytest
-
-from qir_formatter.labeled_formatter import QirLabeledFormatter, QsysShots
+from qir_formatter_core import QirLabeledFormatter, QsysShots
 
 formatting_test_data = [
     ("INT", "i0", 42, "OUTPUT\tINT\t42\ti0\n"),
