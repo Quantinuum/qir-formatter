@@ -9,7 +9,7 @@ from pydantic import StringConstraints
 logger = logging.getLogger(__name__)
 
 QShotValType: TypeAlias = Union[int, bool, float]
-QsysShotItemValue = QShotValType | list[QShotValType]
+QsysShotItemValue = QShotValType | list[int] | list[bool] | list[float]
 QsysShotItem = tuple[
     Annotated[str, StringConstraints(max_length=256)], QsysShotItemValue
 ]
