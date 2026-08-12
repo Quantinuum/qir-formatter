@@ -140,9 +140,13 @@ class QirLabeledFormatter:
         """Given a shot, check the format and emit each user value"""
         for cvar in shot:
             if cvar is not None and len(cvar) >= 2 and cvar[0] is not None:
-                fields = cvar[0].split(":", maxsplit=2)
-                if len(fields) >= 3 and fields[0] == "USER":
-                    self.emit(qo, fields[1], fields[2], cvar[1])
+                name = cvar[0]
+                if not name.startswith("USER:"):
+                    continue
+
+                ftype, sep, tag = name[5:].partition(":")
+                if sep:
+                    self.emit(qo, ftype, tag, cvar[1])
 
     def qir_labeled_output(
         self, results: QsysShots, attributes: Dict[str, str | None]
