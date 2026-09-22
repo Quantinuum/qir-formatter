@@ -1,11 +1,13 @@
 [project]
 name = "qir-formatter"
-version = "0.2.0"
-description = "A Python library for QIR Alliance results formatting."
+version = "0.3.0"
+description = "A Rust-backed Python library for QIR Alliance results formatting."
 authors = [
   { name = "Peter Schow", email = "peter.schow@quantinuum.com" },
   { name = "Chester Wringe", email = "chester.wringe@quantinuum.com" },
   { name = "Kartik Singhal", email = "kartik.singhal@quantinuum.com" },
+  { name = "Sam White", email = "sam.white@quantinuum.com" },
+  { name = "Will Angenent", email = "will.angenent@quantinuum.com" },
 ]
 maintainers = [
   { name = "Chester Wringe" },
@@ -19,13 +21,17 @@ keywords = ["qir", "quantum", "formatter", "results"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
-  "Operating System :: OS Independent",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Rust",
   "Topic :: Scientific/Engineering",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
@@ -43,9 +49,10 @@ lint = [
     "ruff>=0.15.8",
     "ty>=0.0.26",
 ]
-test = [
-    "pytest>=9.0.3",
-]
+test = ["pytest>=9.0.3"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.ruff]
 target-version = "py310"
@@ -62,5 +69,12 @@ exclude-newer = "7 days"
 [tool.uv.sources]
 
 [build-system]
-requires = ["uv_build>=0.11.10,<0.12.0"]
-build-backend = "uv_build"
+requires = ["maturin>=1.15,<2"]
+build-backend = "maturin"
+
+[tool.maturin]
+auditwheel = "repair"
+features = ["pyo3/extension-module"]
+module-name = "qir_formatter._native"
+python-source = "src"
+strip = true

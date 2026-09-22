@@ -2,11 +2,14 @@
 
 import typing
 from io import StringIO
+from pathlib import Path
 from typing import Dict, Optional, Union
 
 import pytest
 
 from qir_formatter.labeled_formatter import QirLabeledFormatter, QsysShots
+
+FIXTURE_DIR = Path(__file__).resolve().parents[1] / "src" / "tests" / "data"
 
 formatting_test_data = [
     ("INT", "i0", 42, "OUTPUT\tINT\t42\ti0\n"),
@@ -109,7 +112,7 @@ def test_result_list() -> None:
         "required_num_results": "9",
     }
     qir_output = QirLabeledFormatter().qir_labeled_output(results, attributes)
-    with open("src/tests/data/good1.output", encoding="utf-8") as f:
+    with open(FIXTURE_DIR / "good1.output", encoding="utf-8") as f:
         assert f.read() == qir_output
 
 
@@ -173,7 +176,7 @@ def test_full_raw_result_list(
     ]
 
     qir_output = QirLabeledFormatter().qir_labeled_output(results, attributes)
-    with open(f"src/tests/data/{output_file}", encoding="utf-8") as f:
+    with open(FIXTURE_DIR / output_file, encoding="utf-8") as f:
         assert f.read() == qir_output
 
 
@@ -213,7 +216,7 @@ def test_malformed_raw_result_list() -> None:
         "required_num_results": 9,
     }
     qir_output = QirLabeledFormatter().qir_labeled_output(results, attributes)
-    with open("src/tests/data/malformed1.output", encoding="utf-8") as f:
+    with open(FIXTURE_DIR / "malformed1.output", encoding="utf-8") as f:
         assert f.read() == qir_output
 
 
