@@ -80,7 +80,5 @@ build-backend = "maturin"
 [tool.maturin]
 auditwheel = "repair"
 features = ["pyo3/extension-module"]
-generate-stubs = true
 module-name = "qir_formatter._native"
 python-source = "src"
-strip = true

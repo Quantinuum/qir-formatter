@@ -48,7 +48,7 @@ jobs:
           target: ${{ matrix.target }}
           manylinux: "2014"
           container: ${{ matrix.container }}
-          args: --release --locked --out dist --interpreter ${{ runner.os == 'Linux' && 'python3.10' || 'python' }}
+          args: --release --locked --strip true --out dist --interpreter ${{ runner.os == 'Linux' && 'python3.10' || 'python' }}
       - name: Test installed wheel
         run: |
           python -m pip install --only-binary=:all: dist/*.whl pytest

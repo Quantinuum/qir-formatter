@@ -179,7 +179,8 @@ uv run maturin generate-stubs --locked --out src
 ```
 
 The normal check script regenerates the stub and fails in CI if the committed
-file is stale. Release wheels also generate the stub while building.
+file is stale. Release wheels package the checked generated stub and exercise it
+through the installed-wheel tests.
 
 ### Dependency Audit
 
