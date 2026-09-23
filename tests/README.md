@@ -6,6 +6,10 @@ resolve fixtures relative to the repository root instead of the
 working directory. The tests reuse the four fixtures in `src/tests/data/`,
 which are also used by the Rust tests.
 
+This suite is a permanent compatibility boundary for the Python package, not a
+temporary migration aid. New binding or packaging behavior should be covered
+here, while formatter-core behavior should also have focused Rust unit tests.
+
 From the repository root, with Rust available (e.g. in the development shell):
 
 ```sh

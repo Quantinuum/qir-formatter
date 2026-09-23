@@ -1,4 +1,22 @@
 //! QIR labeled formatting, with an optional Python compatibility adapter.
+//!
+//! The Rust API accepts typed shot data and returns QIR 2.1 labeled output:
+//!
+//! ```
+//! use _native::{
+//!     QShotValType, QirLabeledFormatter, QirMetadata, QsysShotItemValue, QsysShots,
+//! };
+//!
+//! let results: QsysShots = vec![vec![(
+//!     "USER:INT:answer".into(),
+//!     QsysShotItemValue::Scalar(QShotValType::Int(42)),
+//! )]];
+//! let output = QirLabeledFormatter::new().qir_labeled_output(&results, &QirMetadata::new());
+//!
+//! assert!(output.contains("OUTPUT\tINT\t42\tanswer\n"));
+//! ```
+
+#![warn(missing_docs)]
 
 mod labeled_formatter;
 
@@ -61,5 +79,28 @@ mod tests {
         );
 
         assert_eq!(output.text, "OUTPUT\tRESULT_ARRAY\t101\tbits\n");
+    }
+
+    /// Cargo and Python package metadata must describe the same release.
+    #[test]
+    fn test_python_and_rust_versions_match() {
+        let pyproject = include_str!("../pyproject.toml");
+        let project = pyproject
+            .split_once("[project]")
+            .expect("pyproject.toml must contain a [project] table")
+            .1
+            .split("\n[")
+            .next()
+            .unwrap();
+        let python_version = project
+            .lines()
+            .find_map(|line| {
+                line.trim()
+                    .strip_prefix("version = \"")
+                    .and_then(|value| value.strip_suffix('"'))
+            })
+            .expect("[project] must contain a quoted version");
+
+        assert_eq!(python_version, env!("CARGO_PKG_VERSION"));
     }
 }
