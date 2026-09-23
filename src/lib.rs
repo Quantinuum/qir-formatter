@@ -29,19 +29,10 @@ pub use labeled_formatter::{
 mod python;
 
 #[cfg(feature = "python")]
-use pyo3::prelude::*;
-
-#[cfg(feature = "python")]
-#[pymodule]
-fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
-    module.add_class::<python::PythonQirLabeledFormatter>()?;
-    let class = module.getattr("QirLabeledFormatter")?;
-    let validators = pyo3::types::PyTuple::new(
-        module.py(),
-        [class.getattr("_val_tag_type")?, class.getattr("_val_null")?],
-    )?;
-    class.setattr("val_fns", validators)?;
-    Ok(())
+#[pyo3::pymodule]
+mod _native {
+    #[pymodule_export]
+    use crate::python::PythonQirLabeledFormatter;
 }
 
 #[cfg(test)]

@@ -171,6 +171,16 @@ fixtures in `src/tests/data/` and run in CI. After editing Rust source, rebuild
 the extension with `uv sync --all-groups --reinstall-package qir-formatter`
 before running pytest.
 
+The private extension stub is generated from the PyO3 declarations. Regenerate
+it after changing the Python binding surface:
+
+```sh
+uv run maturin generate-stubs --locked --out src
+```
+
+The normal check script regenerates the stub and fails in CI if the committed
+file is stale. Release wheels also generate the stub while building.
+
 ### Dependency Audit
 
 ```sh

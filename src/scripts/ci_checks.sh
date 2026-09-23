@@ -4,9 +4,14 @@ set -Eeuo pipefail
 set -o xtrace
 DIR=$(dirname "$(realpath "$0")")
 SRC_DIR="${DIR}/../qir_formatter"
+STUB_ROOT="${DIR}/.."
 TEST_DIR="${DIR}/../../tests"
 
 
+uv run maturin generate-stubs --locked --out "${STUB_ROOT}"
+if [[ "${CI:-}" == "true" ]]; then
+    git diff --exit-code -- "${SRC_DIR}/_native.pyi"
+fi
 uv run ty check "${SRC_DIR}" "${TEST_DIR}"
 cargo fmt --check
 cargo clippy --all-targets -- -D warnings

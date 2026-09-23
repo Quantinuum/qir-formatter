@@ -4,7 +4,7 @@ use crate::{
     QsysShotItemValue,
 };
 use pyo3::prelude::*;
-use pyo3::types::{PyBool, PyDict, PyFloat, PyInt, PyList};
+use pyo3::types::{PyBool, PyDict, PyFloat, PyInt, PyList, PyTuple};
 
 /// Convert a Python scalar, checking bool before int because bool is an int subclass.
 fn scalar(value: &Bound<'_, PyAny>) -> Option<QShotValType> {
@@ -106,19 +106,32 @@ impl PythonQirLabeledFormatter {
         Self(QirLabeledFormatter::new())
     }
 
+    #[classattr]
+    fn val_fns(py: Python<'_>) -> PyResult<Py<PyTuple>> {
+        let class = py.get_type::<Self>();
+        PyTuple::new(
+            py,
+            [class.getattr("_val_tag_type")?, class.getattr("_val_null")?],
+        )
+        .map(Bound::unbind)
+    }
+
     /// No null tags or null values allowed (empty strings permitted for tags)
+    #[pyo3(signature = (tag: "str", val))]
     fn _val_null(&self, tag: &Bound<'_, PyAny>, val: &Bound<'_, PyAny>) -> bool {
         self.0
             ._val_null((!tag.is_none()).then_some(""), &presence(val))
     }
 
     /// Tag must be a string
+    #[pyo3(signature = (tag: "str", _val))]
     fn _val_tag_type(&self, tag: &Bound<'_, PyAny>, _val: &Bound<'_, PyAny>) -> bool {
         self.0
             ._val_tag_type(tag.extract::<&str>().ok(), &presence(_val))
     }
 
     /// Ensure the tag and value are valid values
+    #[pyo3(signature = (tag: "str", val))]
     fn validate_tag_and_value(&self, tag: &Bound<'_, PyAny>, val: &Bound<'_, PyAny>) -> bool {
         self.0
             .validate_tag_and_value(tag.extract::<&str>().ok(), &presence(val))
@@ -130,6 +143,7 @@ impl PythonQirLabeledFormatter {
     }
 
     /// Emit opening shot boundary header.
+    #[pyo3(signature = (qo, attributes: "dict[str, str | None]"))]
     fn first_shot_header(
         &self,
         qo: &Bound<'_, PyAny>,
@@ -145,6 +159,7 @@ impl PythonQirLabeledFormatter {
     }
 
     /// Emit a value with of the given type and tag.
+    #[pyo3(signature = (qo, ftype: "str", tag: "str", val))]
     fn emit(
         &self,
         qo: &Bound<'_, PyAny>,
@@ -163,6 +178,7 @@ impl PythonQirLabeledFormatter {
     }
 
     /// Format the value if required
+    #[pyo3(signature = (type_str: "str", val))]
     fn format_value(&self, type_str: &str, val: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
         match self.0.format_value(type_str, &value(val)) {
             FormattedValue::Original => Ok(val.clone().unbind()),
@@ -178,6 +194,7 @@ impl PythonQirLabeledFormatter {
     }
 
     /// Write the first shot, which includes extra metadata
+    #[pyo3(signature = (qo, shot, attributes: "dict[str, str | None]"))]
     fn write_first_shot(
         &self,
         qo: &Bound<'_, PyAny>,
@@ -197,6 +214,7 @@ impl PythonQirLabeledFormatter {
 
     /// Given a list of results associated with an `n_qubits` job, return
     /// the results in QIR "Labeled" Output Schema format.
+    #[pyo3(signature = (results, attributes: "dict[str, str | None]"))]
     fn qir_labeled_output(
         &self,
         results: &Bound<'_, PyAny>,
@@ -213,55 +231,5 @@ impl PythonQirLabeledFormatter {
         self.0
             .write_results(&mut output, &shots, &metadata(attributes)?);
         finish(results.py(), output)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::PythonQirLabeledFormatter;
-    use pyo3::impl_::{pyclass::PyClassImpl, pymethods::PyMethodDefType};
-    use std::{collections::HashMap, ffi::CStr};
-
-    /// Editor documentation and runtime help should expose the same docstrings.
-    #[test]
-    fn test_formatter_stub_and_runtime_docstrings_match() {
-        // Inspect the docs PyO3 supplies to Python without initializing an interpreter.
-        let stub = include_str!("qir_formatter/_native.pyi");
-        let class = stub.split_once("class QirLabeledFormatter:").unwrap().1;
-        assert_eq!(
-            PythonQirLabeledFormatter::RAW_DOC.to_str().unwrap().trim(),
-            class.split("\"\"\"").nth(1).unwrap().trim()
-        );
-        let mut docs = HashMap::new();
-        for items in PythonQirLabeledFormatter::items_iter() {
-            for method in items.methods {
-                if let PyMethodDefType::Method(method) = method {
-                    let method = method.into_raw();
-                    // SAFETY: PyO3 supplies non-null pointers to static C strings.
-                    let name = unsafe { CStr::from_ptr(method.ml_name) }.to_str().unwrap();
-                    let doc = unsafe { CStr::from_ptr(method.ml_doc) }.to_str().unwrap();
-                    docs.insert(
-                        name,
-                        doc.split_once("\n--\n\n")
-                            .map_or(doc, |(_, doc)| doc)
-                            .trim(),
-                    );
-                }
-            }
-        }
-        for method in class.split("    def ").skip(1) {
-            let name = method.split_once('(').unwrap().0;
-            let expected = method
-                .split("\"\"\"")
-                .nth(1)
-                .unwrap()
-                .trim()
-                .lines()
-                .map(str::trim)
-                .collect::<Vec<_>>()
-                .join("\n");
-            assert!(!expected.is_empty(), "Missing stub docstring for {name}");
-            assert_eq!(docs.get(name).copied(), Some(expected.as_str()), "{name}");
-        }
     }
 }
