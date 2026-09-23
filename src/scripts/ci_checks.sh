@@ -3,14 +3,21 @@
 set -Eeuo pipefail
 set -o xtrace
 DIR=$(dirname "$(realpath "$0")")
+REPO_ROOT=$(realpath "${DIR}/../..")
 SRC_DIR="${DIR}/../qir_formatter"
 STUB_ROOT="${DIR}/.."
+STUB_PATH="src/qir_formatter/_native.pyi"
 TEST_DIR="${DIR}/../../tests"
 
 
 uv run maturin generate-stubs --locked --out "${STUB_ROOT}"
 if [[ "${CI:-}" == "true" ]]; then
-    git diff --exit-code -- "${SRC_DIR}/_native.pyi"
+    STUB_STATUS=$(git -C "${REPO_ROOT}" status --porcelain --untracked-files=all -- "${STUB_PATH}")
+    if [[ -n "${STUB_STATUS}" ]]; then
+        echo "Generated stub is stale:"
+        echo "${STUB_STATUS}"
+        exit 1
+    fi
 fi
 uv run ty check "${SRC_DIR}" "${TEST_DIR}"
 cargo fmt --check
