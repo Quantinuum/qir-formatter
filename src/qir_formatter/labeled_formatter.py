@@ -7,7 +7,7 @@ from pydantic import StringConstraints
 from qir_formatter._native import QirLabeledFormatter
 
 QShotValType: TypeAlias = Union[int, bool, float]
-QsysShotItemValue = QShotValType | list[QShotValType]
+QsysShotItemValue = QShotValType | list[int] | list[bool] | list[float]
 QsysShotItem = tuple[
     Annotated[str, StringConstraints(max_length=256)], QsysShotItemValue
 ]
