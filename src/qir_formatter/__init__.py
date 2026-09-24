@@ -10,8 +10,8 @@ from qir_formatter.labeled_formatter import (
 )
 
 __all__ = [
-    "QirLabeledFormatter",
     "QShotValType",
+    "QirLabeledFormatter",
     "QsysShot",
     "QsysShotItem",
     "QsysShotItemValue",

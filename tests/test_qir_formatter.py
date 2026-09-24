@@ -3,7 +3,6 @@
 import typing
 from io import StringIO
 from pathlib import Path
-from typing import Dict, Optional, Union
 
 import pytest
 
@@ -27,7 +26,7 @@ formatting_test_data = [
 def test_formatting(
     ftype: str,
     tag: str,
-    value: int | float | list[int | bool],
+    value: float | list[int | bool],
     expected: str,
 ) -> None:
     """Test raw data types that are rendered to QIR output."""
@@ -66,9 +65,9 @@ malformed_testdata = [
 
 @pytest.mark.parametrize("ftype,tag,value", malformed_testdata)
 def test_malformed(
-    ftype: Optional[str],
-    tag: Optional[Union[str, float]],
-    value: Optional[int],
+    ftype: str | None,
+    tag: str | float | None,
+    value: int | None,
 ) -> None:
     "Test improperly formatted raw data."
     qo = StringIO()
@@ -106,7 +105,7 @@ def test_result_list() -> None:
         ],
     ]
 
-    attributes: Dict[str, str | None] = {
+    attributes: dict[str, str | None] = {
         "qir_profiles": "base_profile",
         "required_num_qubits": "9",
         "required_num_results": "9",
@@ -126,7 +125,7 @@ testdata = [(qir_attributes, "full1.output"), ({}, "missing_attributes.output")]
 
 @pytest.mark.parametrize("attributes,output_file", testdata)
 def test_full_raw_result_list(
-    attributes: Dict[str, str | None],
+    attributes: dict[str, str | None],
     output_file: str,
 ) -> None:
     """
@@ -228,7 +227,7 @@ def test_empty_tag_submission() -> None:
             ("USER:QIRTUPLE:", 2),
         ]
     ]
-    attributes: Dict[str, str | None] = {}
+    attributes: dict[str, str | None] = {}
     qir_output = QirLabeledFormatter().qir_labeled_output(results, attributes)
     # assert that the output still shows with ARRAY and TUPLE types
     assert "OUTPUT\tARRAY\t2\t\n" in qir_output

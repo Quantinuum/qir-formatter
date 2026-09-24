@@ -113,7 +113,7 @@ jobs:
       - name: Require "BREAKING CHANGE:" footer for breaking changes
         id: breaking-comment
         if: ${{ steps.breaking.outputs.breaking == 'true' && steps.breaking.outputs.has_breaking_footer == 'false' }}
-        uses: marocchino/sticky-pull-request-comment@v3.0.4
+        uses: marocchino/sticky-pull-request-comment@v3.0.5
         with:
           header: pr-title-lint-error
           message: |
@@ -127,7 +127,7 @@ jobs:
         run: exit 1
 
       - name: Post a comment if the PR badly formatted
-        uses: marocchino/sticky-pull-request-comment@v3.0.4
+        uses: marocchino/sticky-pull-request-comment@v3.0.5
         # When the previous steps fails, the workflow would stop. By adding this
         # condition you can continue the execution with the populated error message.
         if: always() && (steps.lint_pr_title.outputs.error_message != null)
@@ -158,7 +158,7 @@ jobs:
       # Delete previous comments when the issues have been resolved
       # This step doesn't run if any of the previous checks fails.
       - name: Delete previous comments
-        uses: marocchino/sticky-pull-request-comment@v3.0.4
+        uses: marocchino/sticky-pull-request-comment@v3.0.5
         with:
           header: pr-title-lint-error
           delete: true
