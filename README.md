@@ -1,6 +1,6 @@
 # QIR Formatter
 
-`qir-formatter` is a Python library for rendering execution results into the
+`qir-formatter` is a Rust-backed Python library for rendering execution results into the
 [QIR labeled output schema](https://github.com/qir-alliance/qir-spec/blob/2.1/specification/output_schemas/Labeled.md).
 It accepts shot-oriented result data in the internal `USER:<TYPE>:<TAG>` form
 and emits the text format expected by tools that consume labeled QIR output.
@@ -10,6 +10,23 @@ and emits the text format expected by tools that consume labeled QIR output.
 ```sh
 pip install qir-formatter
 ```
+
+The release workflow builds native wheels for standard (GIL-enabled) CPython
+3.10 and newer on:
+
+- Linux x86-64 and ARM64 (manylinux2014, glibc 2.17 or newer)
+- macOS Intel and Apple Silicon
+- Windows x86-64
+
+Installing a matching wheel does not require Rust. Other targets, including
+Alpine/musl, Windows ARM64, and 32-bit platforms, do not have prebuilt wheels;
+installation falls back to the source distribution and requires Rust 1.85 or
+newer and a platform C/C++ build toolchain. Source builds on these targets are
+not tested by the release workflow. Free-threaded Python and alternative Python
+implementations are not covered by the wheel matrix.
+
+Every wheel is installed and checked with the Python compatibility tests before
+publishing.
 
 ## Usage
 
@@ -68,9 +85,34 @@ QIR schema as follows:
 Malformed values are skipped rather than raising, which makes the formatter
 safe to use on partially clean result streams.
 
+## Rust API
+
+`src/labeled_formatter.rs` is the single formatting implementation. It exposes
+the formatter's validation, header/footer, value, shot, and complete-output
+methods with typed Rust inputs. Writer methods append to a concrete `QirOutput`
+buffer containing text and a malformed-value count. Floats use Rust's standard
+formatting, not Python's exact decimal notation.
+
+Malformed-value warnings use Rust's `log` crate with debug-formatted context.
+The calling application configures the logger. The Python adapter also emits
+the original plain warning through Python's `logging` module.
+
+`src/python.rs` only adapts Python inputs, return values, text writers, and
+logging. It does not build QIR records or dispatch through Python formatter
+methods. The unchanged Python tests define the compatibility target; Python
+subclass/override hooks and weak references are not supported. Output is buffered
+before being passed to a Python writer.
+
+The core has no Python dependency and can be tested independently:
+
+```sh
+cargo test
+```
+
 ## Development
 
-The primary contributor workflow uses `uv`.
+The primary contributor workflow uses `uv` and a Rust toolchain. The package is
+built as a PyO3 extension with Maturin; its public Python imports are unchanged.
 
 ```sh
 uv sync --all-groups
@@ -87,16 +129,22 @@ example`.
 ### Linting
 
 ```sh
-uv run ruff format --check src
-uv run ruff check src
-uv run ty check src
+uv run ruff format --check src tests
+uv run ruff check src tests
+uv run ty check src tests
 ```
 
 ### Testing
 
 ```sh
+cargo test
 uv run pytest
 ```
+
+The Python compatibility suite in `tests/` verifies the public bindings against
+the original Python behavior. Both suites share the fixtures in `src/tests/data/`
+and run in CI. After editing Rust source, rebuild the extension with
+`uv sync --all-groups --reinstall-package qir-formatter` before running pytest.
 
 ### Dependency Audit
 

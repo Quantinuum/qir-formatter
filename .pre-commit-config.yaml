@@ -17,8 +17,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: clippy
+        name: clippy
+        entry: cargo clippy --all-targets -- -D warnings
+        language: system
+        pass_filenames: false
       - id: ty
         name: ty
-        entry: uv run ty check src
+        entry: uv run ty check src tests
         language: system
         pass_filenames: false

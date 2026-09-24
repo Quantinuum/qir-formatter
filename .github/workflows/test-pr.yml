@@ -24,9 +24,19 @@ jobs:
                 ref: refs/pull/${{ github.event.pull_request.number }}/merge
                 sparse-checkout: |
                     .github
+                    build.rs
+                    Cargo.lock
+                    Cargo.toml
                     pyproject.toml
                     src
+                    tests
                     uv.lock
+                    README.md
+                    LICENSE
+            - name: Set up Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                components: clippy,rustfmt
             - name: Set up Python
               uses: actions/setup-python@v6
               with:
@@ -51,15 +61,5 @@ jobs:
               run: |
                 uv sync --locked --all-groups
 
-            - name: Run ci_checks.sh script, if it's present
-              run: test ! -f src/scripts/ci_checks.sh || uv run src/scripts/ci_checks.sh
-
-            - name: Test qir-formatter with pytest
-              run: |
-                uv run pytest src/tests
-
-            - name: Upload pytest test results
-              uses: actions/upload-artifact@v7
-              with:
-                name: pytest-results
-                path: src/qir_formatter/htmlcov
+            - name: Run Rust and Python checks
+              run: uv run src/scripts/ci_checks.sh
