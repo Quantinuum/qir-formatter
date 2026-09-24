@@ -14,7 +14,7 @@ pip install qir-formatter
 Rust consumers can add the crate from crates.io:
 
 ```sh
-cargo add qir-formatter
+cargo add qir-formatter --rename qir_formatter
 ```
 
 The release workflow builds native wheels for standard (GIL-enabled) CPython
