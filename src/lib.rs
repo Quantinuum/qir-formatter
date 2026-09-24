@@ -72,9 +72,9 @@ mod tests {
         assert_eq!(output.text, "OUTPUT\tRESULT_ARRAY\t101\tbits\n");
     }
 
-    /// Cargo and Python package metadata must describe the same release.
+    /// Python package metadata must derive its version from Cargo.
     #[test]
-    fn test_python_and_rust_versions_match() {
+    fn test_python_version_is_dynamic() {
         let pyproject = include_str!("../pyproject.toml");
         let project = pyproject
             .split_once("[project]")
@@ -83,15 +83,16 @@ mod tests {
             .split("\n[")
             .next()
             .unwrap();
-        let python_version = project
-            .lines()
-            .find_map(|line| {
-                line.trim()
-                    .strip_prefix("version = \"")
-                    .and_then(|value| value.strip_suffix('"'))
-            })
-            .expect("[project] must contain a quoted version");
 
-        assert_eq!(python_version, env!("CARGO_PKG_VERSION"));
+        assert!(
+            project
+                .lines()
+                .any(|line| line.trim() == r#"dynamic = ["version"]"#)
+        );
+        assert!(
+            !project
+                .lines()
+                .any(|line| line.trim().starts_with("version ="))
+        );
     }
 }
