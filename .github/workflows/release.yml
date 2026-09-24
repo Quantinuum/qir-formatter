@@ -109,6 +109,7 @@ jobs:
         uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: false
       - name: Publish to PyPI
         run: uv publish
         env:
