@@ -17,4 +17,4 @@ python = ["dep:pyo3"]
 
 [dependencies]
 log = "0.4"
-pyo3 = { version = "0.29.2", features = ["abi3-py310"], optional = true }
+pyo3 = { version = "0.29.2", features = ["abi3-py310", "experimental-inspect"], optional = true }

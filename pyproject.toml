@@ -44,7 +44,11 @@ Repository = "https://github.com/Quantinuum/qir-formatter"
 Issues = "https://github.com/Quantinuum/qir-formatter/issues"
 
 [dependency-groups]
-dev = [{ include-group = "lint" }, { include-group = "test" }]
+dev = [
+    { include-group = "lint" },
+    { include-group = "test" },
+    "maturin>=1.15,<2",
+]
 lint = [
     "ruff>=0.15.8",
     "ty>=0.0.26",
@@ -55,6 +59,7 @@ test = ["pytest>=9.0.3"]
 testpaths = ["tests"]
 
 [tool.ruff]
+extend-exclude = ["src/qir_formatter/_native.pyi"]
 target-version = "py310"
 
 [tool.ty.terminal]
@@ -77,4 +82,3 @@ auditwheel = "repair"
 features = ["pyo3/extension-module"]
 module-name = "qir_formatter._native"
 python-source = "src"
-strip = true

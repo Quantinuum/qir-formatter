@@ -260,3 +260,23 @@ def test_malformed_result_array_is_ignored(
         QirLabeledFormatter().emit(qo, "RESULT_ARRAY", "results", value)
     assert qo.getvalue() == ""
     assert "Skipping malformed QIR output value" in caplog.text
+
+
+@pytest.mark.parametrize("value", [-(2**63), 2**63 - 1])
+def test_i64_boundaries_are_emitted(value: int) -> None:
+    """Python integers within the QIR i64 domain are emitted unchanged."""
+    qo = StringIO()
+    QirLabeledFormatter().emit(qo, "INT", "boundary", value)
+    assert qo.getvalue() == f"OUTPUT\tINT\t{value}\tboundary\n"
+
+
+@pytest.mark.parametrize("value", [-(2**63) - 1, 2**63])
+def test_integer_outside_i64_is_malformed(
+    value: int, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Python integers outside the QIR i64 domain are skipped with a warning."""
+    qo = StringIO()
+    with caplog.at_level("WARNING"):
+        QirLabeledFormatter().emit(qo, "INT", "boundary", value)
+    assert qo.getvalue() == ""
+    assert "Skipping malformed QIR output value" in caplog.text

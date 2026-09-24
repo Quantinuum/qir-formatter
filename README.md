@@ -83,7 +83,9 @@ QIR schema as follows:
 - `QIRTUPLE` becomes `TUPLE`
 
 Malformed values are skipped rather than raising, which makes the formatter
-safe to use on partially clean result streams.
+safe to use on partially clean result streams. Integer records use the signed
+64-bit domain defined by the QIR record-output ABI. Python integers outside
+`-(2**63)` through `2**63 - 1` are malformed and are skipped with a warning.
 
 ## Rust API
 
@@ -92,6 +94,27 @@ the formatter's validation, header/footer, value, shot, and complete-output
 methods with typed Rust inputs. Writer methods append to a concrete `QirOutput`
 buffer containing text and a malformed-value count. Floats use Rust's standard
 formatting, not Python's exact decimal notation.
+
+Consumers can rename the package dependency to give the library an idiomatic
+crate name:
+
+```toml
+[dependencies]
+qir_formatter = { package = "qir-formatter", git = "https://github.com/Quantinuum/qir-formatter" }
+```
+
+```rust
+use qir_formatter::{
+    QShotValType, QirLabeledFormatter, QirMetadata, QsysShotItemValue, QsysShots,
+};
+
+let results: QsysShots = vec![vec![(
+    "USER:INT:answer".into(),
+    QsysShotItemValue::Scalar(QShotValType::Int(42)),
+)]];
+let output = QirLabeledFormatter::new().qir_labeled_output(&results, &QirMetadata::new());
+assert!(output.contains("OUTPUT\tINT\t42\tanswer\n"));
+```
 
 Malformed-value warnings use Rust's `log` crate with debug-formatted context.
 The calling application configures the logger. The Python adapter also emits
@@ -141,10 +164,23 @@ cargo test
 uv run pytest
 ```
 
-The Python compatibility suite in `tests/` verifies the public bindings against
-the original Python behavior. Both suites share the fixtures in `src/tests/data/`
-and run in CI. After editing Rust source, rebuild the extension with
-`uv sync --all-groups --reinstall-package qir-formatter` before running pytest.
+The Python compatibility suite in `tests/` is a permanent release gate for the
+public bindings and verifies them against the original Python behavior. It
+complements the Rust unit tests and should remain in CI. Both suites share the
+fixtures in `src/tests/data/` and run in CI. After editing Rust source, rebuild
+the extension with `uv sync --all-groups --reinstall-package qir-formatter`
+before running pytest.
+
+The private extension stub is generated from the PyO3 declarations. Regenerate
+it after changing the Python binding surface:
+
+```sh
+uv run maturin generate-stubs --locked --out src
+```
+
+The normal check script regenerates the stub and fails in CI if the committed
+file is stale. Release wheels package the checked generated stub and exercise it
+through the installed-wheel tests.
 
 ### Dependency Audit
 

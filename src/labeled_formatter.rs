@@ -5,16 +5,22 @@ use std::collections::HashMap;
 /// Scalar values in a shot.
 #[derive(Clone, Debug, PartialEq)]
 pub enum QShotValType {
+    /// A Boolean value.
     Bool(bool),
+    /// A signed 64-bit integer, matching the QIR record-output ABI.
     Int(i64),
+    /// A double-precision floating-point value.
     Float(f64),
 }
 
 /// Invalid inputs are retained so the formatter can skip them.
 #[derive(Clone, Debug, PartialEq)]
 pub enum QsysShotItemValue {
+    /// A single scalar value.
     Scalar(QShotValType),
+    /// A sequence of scalar values.
     List(Vec<QShotValType>),
+    /// An input that could not be converted to a supported value.
     Invalid,
 }
 
@@ -30,21 +36,31 @@ impl QShotValType {
     }
 }
 
+/// A named value from one shot, normally using `USER:<TYPE>:<TAG>`.
 pub type QsysShotItem = (String, QsysShotItemValue);
+/// All named values in one execution shot.
 pub type QsysShot = Vec<QsysShotItem>;
+/// A collection of execution shots.
 pub type QsysShots = Vec<QsysShot>;
+/// Metadata written into the first shot header.
 pub type QirMetadata = HashMap<String, String>;
 
 /// A concrete output buffer with a malformed-value count.
 #[derive(Default)]
 pub struct QirOutput {
+    /// Rendered labeled-output text.
     pub text: String,
+    /// Number of malformed values skipped while rendering.
     pub malformed: usize,
 }
 
+/// The result of applying type-specific formatting to a value.
 pub enum FormattedValue {
+    /// Preserve the value's ordinary scalar or list representation.
     Original,
+    /// Use the supplied formatted text.
     Text(String),
+    /// Skip the value as malformed.
     Invalid,
 }
 
@@ -53,6 +69,7 @@ pub enum FormattedValue {
 pub struct QirLabeledFormatter;
 
 impl QirLabeledFormatter {
+    /// Construct a formatter.
     pub const fn new() -> Self {
         Self
     }
@@ -204,6 +221,7 @@ impl QirLabeledFormatter {
         self.shot_footer(qo);
     }
 
+    /// Write all shots, including the schema header and first-shot metadata.
     pub fn write_results(
         &self,
         qo: &mut QirOutput,

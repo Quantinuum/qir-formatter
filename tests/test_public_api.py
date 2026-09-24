@@ -1,9 +1,6 @@
 """Public package surface tests."""
 
-import ast
-import inspect
 from io import StringIO
-from pathlib import Path
 
 from qir_formatter import QirLabeledFormatter, QsysShots
 
@@ -26,20 +23,8 @@ def test_top_level_formatter_can_emit_values() -> None:
     assert out.getvalue() == "OUTPUT\tRESULT_ARRAY\t101\tbits\n"
 
 
-def test_formatter_stub_and_runtime_docstrings_match() -> None:
-    """Editor documentation and runtime help should expose the same docstrings."""
-    stub = Path(__file__).resolve().parents[1] / "src/qir_formatter/_native.pyi"
-    module = ast.parse(stub.read_text())
-    formatter = next(
-        node
-        for node in module.body
-        if isinstance(node, ast.ClassDef) and node.name == "QirLabeledFormatter"
-    )
-    assert ast.get_docstring(formatter) == inspect.getdoc(QirLabeledFormatter)
-    for method in formatter.body:
-        if isinstance(method, ast.FunctionDef):
-            docstring = ast.get_docstring(method)
-            assert docstring, f"Missing stub docstring for {method.name}"
-            assert docstring == inspect.getdoc(
-                getattr(QirLabeledFormatter, method.name)
-            ), method.name
+def test_validator_registry_remains_callable() -> None:
+    """The legacy validator registry remains available on the native class."""
+    formatter = QirLabeledFormatter()
+
+    assert all(validator(formatter, "tag", 1) for validator in formatter.val_fns)
