@@ -11,6 +11,12 @@ and emits the text format expected by tools that consume labeled QIR output.
 pip install qir-formatter
 ```
 
+Rust consumers can add the crate from crates.io:
+
+```sh
+cargo add qir-formatter --rename qir_formatter
+```
+
 The release workflow builds native wheels for standard (GIL-enabled) CPython
 3.10 and newer on:
 
@@ -95,12 +101,12 @@ methods with typed Rust inputs. Writer methods append to a concrete `QirOutput`
 buffer containing text and a malformed-value count. Floats use Rust's standard
 formatting, not Python's exact decimal notation.
 
-Consumers can rename the package dependency to give the library an idiomatic
-crate name:
+The published package uses a hyphenated crates.io name. Consumers can rename the
+dependency to give the library an idiomatic crate name:
 
 ```toml
 [dependencies]
-qir_formatter = { package = "qir-formatter", git = "https://github.com/Quantinuum/qir-formatter" }
+qir_formatter = { package = "qir-formatter", version = "0.3" }
 ```
 
 ```rust

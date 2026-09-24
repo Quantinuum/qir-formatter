@@ -4,8 +4,12 @@ version = "0.3.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Rust implementation of the QIR labeled results formatter"
+readme = "README.md"
 license = "Apache-2.0"
 repository = "https://github.com/Quantinuum/qir-formatter"
+documentation = "https://docs.rs/qir-formatter"
+keywords = ["qir", "quantum", "formatter", "results"]
+categories = ["encoding", "science", "science::quantum-computing"]
 
 [lib]
 name = "_native"
