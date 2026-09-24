@@ -1,6 +1,6 @@
 [project]
 name = "qir-formatter"
-version = "0.3.0"
+dynamic = ["version"]
 description = "A Rust-backed Python library for QIR Alliance results formatting."
 authors = [
   { name = "Peter Schow", email = "peter.schow@quantinuum.com" },
