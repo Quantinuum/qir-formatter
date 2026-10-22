@@ -21,13 +21,12 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v7
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v10.3.0
-        with:
-          version: '0.13.4'
-          python-version: ${{ env.PYTHON_VERSION }}
-      - name: Update Rust bootstrap trust
-        run: bash .github/scripts/setup-rust-trust.sh
+      - name: Update CA certificates
+        run: |
+          sudo apt-get update
+          sudo apt-get install --only-upgrade -y ca-certificates
+      - name: Update Rust
+        run: rustup update
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
       - name: Verify package
@@ -68,9 +67,19 @@ jobs:
         uses: astral-sh/setup-uv@v10.3.0
         with:
           version: '0.13.4'
-      - name: Update Rust bootstrap trust
-        if: runner.os != 'Linux'
-        run: bash .github/scripts/setup-rust-trust.sh
+      - name: Update macOS Rustup and CA certificates
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew upgrade rustup ca-certificates
+          echo "$(brew --prefix rustup)/bin" >> "$GITHUB_PATH"
+          bundle="$(brew --prefix)/etc/ca-certificates/cert.pem"
+          for name in SSL_CERT_FILE CURL_CA_BUNDLE CARGO_HTTP_CAINFO GIT_SSL_CAINFO; do
+            printf '%s=%s\n' "$name" "$bundle" >> "$GITHUB_ENV"
+          done
+      - name: Update Rust
+        if: runner.os == 'Windows'
+        run: rustup update
       - name: Build wheel
         uses: PyO3/maturin-action@v1
         with:

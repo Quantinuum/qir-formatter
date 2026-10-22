@@ -49,8 +49,13 @@ jobs:
                   **/uv.lock
                   **/pyproject.toml
 
-            - name: Update Rust bootstrap trust
-              run: bash .github/scripts/setup-rust-trust.sh
+            - name: Update CA certificates
+              run: |
+                sudo apt-get update
+                sudo apt-get install --only-upgrade -y ca-certificates
+
+            - name: Update Rust
+              run: rustup update
 
             - name: Set up Rust
               uses: dtolnay/rust-toolchain@stable
