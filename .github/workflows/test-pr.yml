@@ -33,10 +33,6 @@ jobs:
                     uv.lock
                     README.md
                     LICENSE
-            - name: Set up Rust
-              uses: dtolnay/rust-toolchain@stable
-              with:
-                components: clippy,rustfmt
             - name: Set up Python
               uses: actions/setup-python@v7
               with:
@@ -52,6 +48,14 @@ jobs:
                 cache-dependency-glob: |
                   **/uv.lock
                   **/pyproject.toml
+
+            - name: Update Rust bootstrap trust
+              run: bash .github/scripts/setup-rust-trust.sh
+
+            - name: Set up Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                components: clippy,rustfmt
 
             - name: Audit dependencies
               run: |

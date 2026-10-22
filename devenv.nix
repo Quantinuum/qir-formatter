@@ -3,6 +3,16 @@
 {
   # https://devenv.sh/basics/
   env.GREET = "devenv";
+  env.SSL_CERT_FILE = "${pkgs.cacert.override {
+    blacklist = [
+      "emSign ECC Root CA - G3"
+      "Comodo AAA Services root"
+    ];
+  }}/etc/ssl/certs/ca-bundle.crt";
+  env.CARGO_HTTP_CAINFO = config.env.SSL_CERT_FILE;
+  env.CURL_CA_BUNDLE = config.env.SSL_CERT_FILE;
+  env.GIT_SSL_CAINFO = config.env.SSL_CERT_FILE;
+  env.NIX_SSL_CERT_FILE = config.env.SSL_CERT_FILE;
 
   # https://devenv.sh/packages/
   packages = [ pkgs.git ];
