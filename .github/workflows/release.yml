@@ -66,7 +66,7 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.3.0
         with:
-          version: '0.13.4'
+          version: latest
       - name: Update macOS Rustup and CA certificates
         if: runner.os == 'macOS'
         run: |
@@ -115,7 +115,7 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.3.0
         with:
-          version: '0.13.4'
+          version: latest
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Build source distribution
         run: uv build --sdist --out-dir dist
@@ -140,7 +140,7 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.3.0
         with:
-          version: '0.13.4'
+          version: latest
           python-version: ${{ env.PYTHON_VERSION }}
           enable-cache: false
       - name: Publish to PyPI
