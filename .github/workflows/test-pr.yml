@@ -33,10 +33,6 @@ jobs:
                     uv.lock
                     README.md
                     LICENSE
-            - name: Set up Rust
-              uses: dtolnay/rust-toolchain@stable
-              with:
-                components: clippy,rustfmt
             - name: Set up Python
               uses: actions/setup-python@v7
               with:
@@ -44,14 +40,26 @@ jobs:
                 python-version-file: pyproject.toml
 
             - name: Install uv
-              uses: astral-sh/setup-uv@v10.2.0
+              uses: astral-sh/setup-uv@v10.3.0
               with:
-              # Install a specific version of uv.
-                version: '0.11.2'
+                version: latest
                 enable-cache: true
                 cache-dependency-glob: |
                   **/uv.lock
                   **/pyproject.toml
+
+            - name: Update CA certificates
+              run: |
+                sudo apt-get update
+                sudo apt-get install --only-upgrade -y ca-certificates
+
+            - name: Update Rust
+              run: rustup update
+
+            - name: Set up Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                components: clippy,rustfmt
 
             - name: Audit dependencies
               run: |

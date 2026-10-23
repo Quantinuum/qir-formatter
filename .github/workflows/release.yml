@@ -21,6 +21,12 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v7
+      - name: Update CA certificates
+        run: |
+          sudo apt-get update
+          sudo apt-get install --only-upgrade -y ca-certificates
+      - name: Update Rust
+        run: rustup update
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
       - name: Verify package
@@ -39,6 +45,7 @@ jobs:
         include:
           - os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
+            container: quay.io/pypa/manylinux2014_x86_64:latest
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
             # Build natively on the ARM runner, rather than using a cross-compilation image.
@@ -56,6 +63,28 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.3.0
+        with:
+          version: latest
+      - name: Update macOS Rustup and CA certificates
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew upgrade rustup ca-certificates
+          echo "$(brew --prefix rustup)/bin" >> "$GITHUB_PATH"
+          bundle="$(brew --prefix)/etc/ca-certificates/cert.pem"
+          for name in SSL_CERT_FILE CURL_CA_BUNDLE CARGO_HTTP_CAINFO GIT_SSL_CAINFO; do
+            printf '%s=%s\n' "$name" "$bundle" >> "$GITHUB_ENV"
+          done
+      - name: Update Rust
+        if: runner.os == 'Windows'
+        run: rustup update
+      - name: Pull latest manylinux image
+        if: runner.os == 'Linux'
+        env:
+          MANYLINUX_IMAGE: ${{ matrix.container }}
+        run: docker pull "$MANYLINUX_IMAGE"
       - name: Build wheel
         uses: PyO3/maturin-action@v1
         with:
@@ -63,11 +92,13 @@ jobs:
           target: ${{ matrix.target }}
           manylinux: "2014"
           container: ${{ matrix.container }}
+          docker-options: --env RUSTUP_VERSION=1.29.2 --env PIP_NO_INDEX=1 --env CARGO_HTTP_CAINFO=/opt/_internal/certs.pem
           args: --release --locked --strip true --out dist --interpreter ${{ runner.os == 'Linux' && 'python3.10' || 'python' }}
+        env:
+          # The action's optional CFFI install is unused for PyO3.
+          PIP_NO_INDEX: '1'
       - name: Test installed wheel
-        run: |
-          python -m pip install --only-binary=:all: dist/*.whl pytest
-          python -m pytest tests
+        run: uv run --no-project --isolated --python python --no-build --with dist/*.whl --with pytest python -m pytest tests
       - name: Upload wheel
         uses: actions/upload-artifact@v7
         with:
@@ -82,8 +113,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v7
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10.2.0
+        uses: astral-sh/setup-uv@v10.3.0
         with:
+          version: latest
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Build source distribution
         run: uv build --sdist --out-dir dist
@@ -106,8 +138,9 @@ jobs:
           path: dist
           merge-multiple: true
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10.2.0
+        uses: astral-sh/setup-uv@v10.3.0
         with:
+          version: latest
           python-version: ${{ env.PYTHON_VERSION }}
           enable-cache: false
       - name: Publish to PyPI
